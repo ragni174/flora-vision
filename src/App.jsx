@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -7,27 +7,44 @@ import TopSellingPlants from './components/TopSellingPlants';
 import CustomerReview from './components/CustomerReview';
 import BestO2Section from './components/BestO2Section';
 import Footer from './components/Footer';
+import PageLoader from './components/PageLoader';
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  useEffect(() => {
+    const handler = () => setMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler, { passive: true });
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return mobile;
+}
 
 function App() {
   const containerRef = useRef(null);
+  const isMobile = useIsMobile();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
-  // Parallax transforms
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-  const fgY = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
-  const ghostY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  // Halve parallax travel on mobile
+  const bgY     = useTransform(scrollYProgress, [0, 1], ["0%", isMobile ? "8%"  : "15%"]);
+  const fgY     = useTransform(scrollYProgress, [0, 1], ["0%", isMobile ? "-10%" : "-20%"]);
+  const ghostY  = useTransform(scrollYProgress, [0, 1], ["0%", isMobile ? "15%" : "30%"]);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.5 }}
-      ref={containerRef} 
-      className="min-h-screen bg-[#0f140f] text-white selection:bg-green-500/30 overflow-x-hidden"
-    >
+    <>
+      <PageLoader />
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2, delay: 1.0 }}
+        ref={containerRef} 
+        className="min-h-screen bg-[#0f140f] text-white selection:bg-green-500/30 overflow-x-hidden"
+      >
       
       {/* Cinematic Background Layer System (BACKGROUND) */}
       <motion.div style={{ y: bgY }} className="fixed inset-0 z-0 overflow-hidden pointer-events-none will-change-transform">
@@ -98,6 +115,7 @@ function App() {
 
       <Footer />
     </motion.div>
+    </>
   );
 }
 

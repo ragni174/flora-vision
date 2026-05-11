@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
+import FadeUp from './FadeUp';
 
 export default function TopSellingPlants() {
   const products = [
@@ -61,30 +62,31 @@ export default function TopSellingPlants() {
       <div className="max-w-[1400px] mx-auto">
 
         {/* Header */}
-        <div className="flex justify-center mb-10 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative inline-block"
-          >
-            <h2 className="text-4xl lg:text-5xl font-sans font-bold text-white px-6 py-2">
+        <FadeUp className="flex justify-center mb-10 relative">
+          <div className="relative inline-block">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold text-white px-4 sm:px-6 py-2 text-center">
               Our Top Selling Plants
             </h2>
-            {/* Top Right Bracket */}
             <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-[#a3c965] rounded-tr-lg opacity-80"></div>
-            {/* Bottom Left Bracket */}
             <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-[#a3c965] rounded-bl-lg opacity-80"></div>
-          </motion.div>
-        </div>
+          </div>
+        </FadeUp>
 
-        {/* 3x2 Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 xl:gap-x-12 gap-y-16">
+        {/* Staggered 3×2 Grid */}
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 xl:gap-x-12 gap-y-16"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12 } }
+          }}
+        >
           {products.map((product) => (
             <ProductCard key={product.id} product={product} delay={product.delay} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
